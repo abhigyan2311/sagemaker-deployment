@@ -13922,7 +13922,10 @@ The method does the following:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer:</strong> I don't think there will be a problem as for inference we will have to perform the same set of operations everytime. This will have equal sequence lengths for training and testing dataset which will improve our model.</p>
+<p><strong>Answer:</strong> The implementation of the methods of <code>preprocess_data</code> and <code>convert_and_pad_data</code> is such a that these don't cause any data leakage. Data leakages is when the information of the training data is passed on to the validation/test data. For example, if we first perform the data pre-processing like normalization and then perform splitting the data into training and validation sets. This may cause data leakage.
+In the <code>preprocess_data</code> method, <code>review_to_words</code> function has been applied to the training and test sets separately and also been saved/cached into disk as separate files. Since the <code>review_to_words</code> function has been applied on to the training set and test set separately, any information contained within the training set does not have any effect on to the test set and vice versa. This helps in avoiding any data leakages problems. Moreover, the training (and test) labels have also been not included within the training (and test) data features in the <code>preprocess_data</code> function. In this way, any possible data leakages have been avoided in the preprocess_data function.
+And then, in the <code>convert_and_pad_data</code>, <code>word_dict</code> has been created by training set, avoiding the data leakages. It is used to encode the words to the integers. <code>convert_and_pad_data</code> can only use the training set to construct a representation. Moreover there are words that do not appear in the training set but does in the test set which are then encoded with "INFREQ". This can be ignored and the LSTM can learn the representations based on sequence.
+So the implementation of <code>preprocess_data</code> and <code>convert_and_pad_data</code> methods should not cause data leakage problems.</p>
 
 </div>
 </div>
@@ -14611,8 +14614,9 @@ Billable seconds: 6383
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer:</strong>
-Both models have similar accuracy score .</p>
+<p><strong>Answer:</strong> LSTM uses an embedding vector to learning the sequence in which data(review) is fed to the model while XGBoost uses Bag of Words which does not consider that sequence and the order is lost. In this type of problems, LSTM is better suited as a general understanding is required to get the emotion for that data.</p>
+<p>XGBoost is a tree-based model while LSTM is a sequential model which considers previous state.</p>
+<p>Both models have similar accuracy score .</p>
 
 </div>
 </div>
